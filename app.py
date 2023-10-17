@@ -66,7 +66,7 @@ if torch.cuda.is_available():
 
     # LCM Pipeline:
     pipe = LatentConsistencyModelPipeline(vae=vae, text_encoder=text_encoder, tokenizer=tokenizer, unet=unet, scheduler=scheduler, safety_checker=safety_checker, feature_extractor=feature_extractor)
-    pipe = pipe.to(device="cuda", dtype=DTYPE)
+    pipe = pipe.to(torch_device="cuda", torch_dtype=DTYPE)
 
     if USE_TORCH_COMPILE:
         pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
