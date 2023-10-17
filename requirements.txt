@@ -1,0 +1,7 @@
+accelerate
+diffusers
+gradio==3.48.0
+Pillow
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch==2.0.1
+transformers
