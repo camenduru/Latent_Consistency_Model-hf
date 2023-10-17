@@ -33,6 +33,7 @@ DTYPE = torch.float32  # torch.float16 works as well, but pictures seem to be a 
 
 model_id = "digiplay/DreamShaper_7"
 
+
 # Initalize Diffusers Model:
 vae = AutoencoderKL.from_pretrained(model_id, subfolder="vae")
 text_encoder = CLIPTextModel.from_pretrained(model_id, subfolder="text_encoder")
@@ -47,9 +48,12 @@ feature_extractor = CLIPImageProcessor.from_pretrained(model_id, subfolder="feat
 # Initalize Scheduler:
 scheduler = LCMScheduler(beta_start=0.00085, beta_end=0.0120, beta_schedule="scaled_linear", prediction_type="epsilon")
 
+HF_TOKEN = os.environ.get("HF_TOKEN", None)
+
 if torch.cuda.is_available():
     # Replace the unet with LCM:
-    lcm_unet_ckpt = hf_hub_download("SimianLuo/LCM_Dreamshaper_v7", filename="LCM_Dreamshaper_v7_4k.safetensors")
+    # lcm_unet_ckpt = hf_hub_download("SimianLuo/LCM_Dreamshaper_v7", filename="LCM_Dreamshaper_v7_4k.safetensors", token=HF_TOKEN)
+    lcm_unet_ckpt = "./LCM_Dreamshaper_v7_4k.safetensors"
     ckpt = load_file(lcm_unet_ckpt)
     m, u = unet.load_state_dict(ckpt, strict=False)
     if len(m) > 0:
