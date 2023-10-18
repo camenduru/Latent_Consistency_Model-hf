@@ -175,14 +175,15 @@ with gr.Blocks(css="style.css") as demo:
                 step=1,
                 value=4,
             )
-        # with gr.Row():
-        #     num_images = gr.Slider(
-        #         label="Number of images"
-        #         minimum=1,
-        #         maximum=8,
-        #         step=1,
-        #         value=4,
-        #     )
+         with gr.Row():
+             num_images = gr.Slider(
+                 label="Number of images"
+                 minimum=1,
+                 maximum=8,
+                 step=1,
+                 value=4,
+                 visible=False,
+             )
 
     gr.Examples(
         examples=examples,
@@ -205,6 +206,8 @@ with gr.Blocks(css="style.css") as demo:
             height,
             guidance_scale,
             num_inference_steps,
+            num_images,
+            randomize_seed
         ],
         outputs=[result, seed],
         api_name="run",
