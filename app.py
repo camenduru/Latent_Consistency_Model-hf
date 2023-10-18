@@ -27,7 +27,7 @@ if not torch.cuda.is_available():
 
 MAX_SEED = np.iinfo(np.int32).max
 CACHE_EXAMPLES = torch.cuda.is_available() and os.getenv("CACHE_EXAMPLES") == "1"
-MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", "512"))
+MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", "768"))
 USE_TORCH_COMPILE = os.getenv("USE_TORCH_COMPILE") == "1"
 DTYPE = torch.float32  # torch.float16 works as well, but pictures seem to be a bit worse
 
@@ -88,6 +88,9 @@ def generate(
     num_images: int = 4,
 ) -> PIL.Image.Image:
     torch.manual_seed(seed)
+
+    if width > 512 or height > 512:
+        num_images = 2
 
     return pipe(
         prompt=prompt,
