@@ -177,7 +177,7 @@ with gr.Blocks(css="style.css") as demo:
             )
         with gr.Row():
             num_images = gr.Slider(
-                label="Number of images"
+                label="Number of images",
                 minimum=1,
                 maximum=8,
                 step=1,
