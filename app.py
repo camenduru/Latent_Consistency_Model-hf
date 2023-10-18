@@ -19,6 +19,10 @@ from tqdm import tqdm
 from safetensors.torch import load_file
 from huggingface_hub import hf_hub_download
 
+from concurrent.futures import ThreadPoolExecutor
+import uuid
+import cv2
+
 DESCRIPTION = '''# Latent Consistency Model
 Distilled from [Dreamshaper v7](https://huggingface.co/Lykon/dreamshaper-7) fine-tune of [Stable Diffusion v1-5](https://huggingface.co/runwayml/stable-diffusion-v1-5). [Project page](https://latent-consistency-models.github.io)
 '''
@@ -39,6 +43,17 @@ def randomize_seed_fn(seed: int, randomize_seed: bool) -> int:
     if randomize_seed:
         seed = random.randint(0, MAX_SEED)
     return seed
+
+def save_image(img):
+    unique_name = str(uuid.uuid4()) + '.png'
+    img.save(unique_name)
+    return unique_name
+
+def save_images(image_array):
+    paths = []
+    with ThreadPoolExecutor() as executor:
+        paths = list(executor.map(save_image, image_array))
+    return paths
 
 def generate(
     prompt: str,
@@ -64,9 +79,9 @@ def generate(
         lcm_origin_steps=50,
         output_type="pil",
     ).images
-    
+    paths = save_images(result)
     print(time.time() - start_time)
-    return result, seed
+    return paths, seed
 
 examples = [
     "portrait photo of a girl, photograph, highly detailed face, depth of field, moody light, golden hour, style by Dan Winters, Russell James, Steve McCurry, centered, extremely detailed, Nikon D850, award winning photography",
