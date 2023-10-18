@@ -24,7 +24,7 @@ import uuid
 import cv2
 
 DESCRIPTION = '''# Latent Consistency Model
-Distilled from [Dreamshaper v7](https://huggingface.co/Lykon/dreamshaper-7) fine-tune of [Stable Diffusion v1-5](https://huggingface.co/runwayml/stable-diffusion-v1-5). [Project page](https://latent-consistency-models.github.io)
+Distilled from [Dreamshaper v7](https://huggingface.co/Lykon/dreamshaper-7) fine-tune of [Stable Diffusion v1-5](https://huggingface.co/runwayml/stable-diffusion-v1-5) with only 4,000 training iterations (~32 A100 GPU Hours). [Project page](https://latent-consistency-models.github.io)
 '''
 if not torch.cuda.is_available():
     DESCRIPTION += "\n<p>Running on CPU 🥶 This demo does not work on CPU.</p>"
