@@ -22,7 +22,9 @@ from tqdm import tqdm
 from safetensors.torch import load_file
 from huggingface_hub import hf_hub_download
 
-DESCRIPTION = "# Latent Consistency Model"
+DESCRIPTION = '''# Latent Consistency Model
+#### Distilled from Dreamshaper v7 fine-tune of [Stable Diffusion v1-5](https://huggingface.co/runwayml/stable-diffusion-v1-5). [Project page](https://latent-consistency-models.github.io)
+'''
 if not torch.cuda.is_available():
     DESCRIPTION += "\n<p>Running on CPU 🥶 This demo does not work on CPU.</p>"
 
@@ -78,7 +80,6 @@ def randomize_seed_fn(seed: int, randomize_seed: bool) -> int:
         seed = random.randint(0, MAX_SEED)
     return seed
 
-
 def generate(
     prompt: str,
     seed: int = 0,
@@ -87,11 +88,11 @@ def generate(
     guidance_scale: float = 8.0,
     num_inference_steps: int = 4,
     num_images: int = 4,
+    randomize_seed: bool = False,
+    progress = gr.Progress(track_tqdm=True)
 ) -> PIL.Image.Image:
+    seed = randomize_seed_fn(seed, randomize_seed)
     torch.manual_seed(seed)
-
-    # if width > 512 or height > 512:
-    #     num_images = 2
     start_time = time.time()
     result = pipe(
         prompt=prompt,
@@ -103,8 +104,9 @@ def generate(
         lcm_origin_steps=50,
         output_type="pil",
     ).images
+    
     print(time.time() - start_time)
-    return result
+    return result, seed
 
 examples = [
     "portrait photo of a girl, photograph, highly detailed face, depth of field, moody light, golden hour, style by Dan Winters, Russell James, Steve McCurry, centered, extremely detailed, Nikon D850, award winning photography",
@@ -140,8 +142,9 @@ with gr.Blocks(css="style.css") as demo:
             maximum=MAX_SEED,
             step=1,
             value=0,
+            randomize=True
         )
-        randomize_seed = gr.Checkbox(label="Randomize seed", value=True)
+        randomize_seed = gr.Checkbox(label="Randomize seed across runs", value=True)
         with gr.Row():
             width = gr.Slider(
                 label="Width",
@@ -194,12 +197,6 @@ with gr.Blocks(css="style.css") as demo:
             prompt.submit,
             run_button.click,
         ],
-        fn=randomize_seed_fn,
-        inputs=[seed, randomize_seed],
-        outputs=seed,
-        queue=False,
-        api_name=False,
-    ).then(
         fn=generate,
         inputs=[
             prompt,
@@ -209,10 +206,11 @@ with gr.Blocks(css="style.css") as demo:
             guidance_scale,
             num_inference_steps,
         ],
-        outputs=result,
+        outputs=[result, seed],
         api_name="run",
     )
 
 if __name__ == "__main__":
+    demo.queue(api_open=False)
     # demo.queue(max_size=20).launch()
     demo.launch()
