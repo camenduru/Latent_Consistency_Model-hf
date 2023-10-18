@@ -31,7 +31,7 @@ MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", "768"))
 USE_TORCH_COMPILE = os.getenv("USE_TORCH_COMPILE") == "1"
 DTYPE = torch.float32  # torch.float16 works as well, but pictures seem to be a bit worse
 
-pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", custom_pipeline="latent_consistency_txt2img")
+pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", custom_pipeline="latent_consistency_txt2img", revision="main")
 pipe.to(torch_device="cuda", torch_dtype=DTYPE)
 
 
