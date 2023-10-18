@@ -1,5 +1,5 @@
 ---
-title: Consistency Latency Models
+title: Latent Consistency Models
 emoji: 🎯
 colorFrom: gray
 colorTo: purple
