@@ -9,12 +9,9 @@ import gradio as gr
 import numpy as np
 import PIL.Image
 import torch
-from lcm_pipeline import LatentConsistencyModelPipeline
-from lcm_scheduler import LCMScheduler
 
-from diffusers import AutoencoderKL, UNet2DConditionModel
-from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
-from transformers import CLIPTokenizer, CLIPTextModel, CLIPImageProcessor
+from diffusers import DiffusionPipeline
+import torch
 
 import os
 import torch
@@ -34,45 +31,8 @@ MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", "768"))
 USE_TORCH_COMPILE = os.getenv("USE_TORCH_COMPILE") == "1"
 DTYPE = torch.float32  # torch.float16 works as well, but pictures seem to be a bit worse
 
-model_id = "digiplay/DreamShaper_7"
-
-
-# Initalize Diffusers Model:
-vae = AutoencoderKL.from_pretrained(model_id, subfolder="vae")
-text_encoder = CLIPTextModel.from_pretrained(model_id, subfolder="text_encoder")
-tokenizer = CLIPTokenizer.from_pretrained(model_id, subfolder="tokenizer")
-config = UNet2DConditionModel.load_config(model_id, subfolder="unet")
-config["time_cond_proj_dim"] = 256
-
-unet = UNet2DConditionModel.from_config(config)
-safety_checker = StableDiffusionSafetyChecker.from_pretrained(model_id, subfolder="safety_checker")
-feature_extractor = CLIPImageProcessor.from_pretrained(model_id, subfolder="feature_extractor")
-
-# Initalize Scheduler:
-scheduler = LCMScheduler(beta_start=0.00085, beta_end=0.0120, beta_schedule="scaled_linear", prediction_type="epsilon")
-
-HF_TOKEN = os.environ.get("HF_TOKEN", None)
-
-if torch.cuda.is_available():
-    # Replace the unet with LCM:
-    # lcm_unet_ckpt = hf_hub_download("SimianLuo/LCM_Dreamshaper_v7", filename="LCM_Dreamshaper_v7_4k.safetensors", token=HF_TOKEN)
-    lcm_unet_ckpt = "./LCM_Dreamshaper_v7_4k.safetensors"
-    ckpt = load_file(lcm_unet_ckpt)
-    m, u = unet.load_state_dict(ckpt, strict=False)
-    if len(m) > 0:
-        print("missing keys:")
-        print(m)
-    if len(u) > 0:
-        print("unexpected keys:")
-        print(u)
-
-
-    # LCM Pipeline:
-    pipe = LatentConsistencyModelPipeline(vae=vae, text_encoder=text_encoder, tokenizer=tokenizer, unet=unet, scheduler=scheduler, safety_checker=safety_checker, feature_extractor=feature_extractor)
-    pipe = pipe.to(torch_device="cuda", torch_dtype=DTYPE)
-
-    if USE_TORCH_COMPILE:
-        pipe.unet = torch.compile(pipe.unet, mode="reduce-overhead", fullgraph=True)
+pipe = DiffusionPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", custom_pipeline="latent_consistency_txt2img")
+pipe.to(torch_device="cuda", torch_dtype=DTYPE)
 
 
 def randomize_seed_fn(seed: int, randomize_seed: bool) -> int:
