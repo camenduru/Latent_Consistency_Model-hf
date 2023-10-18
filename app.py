@@ -101,8 +101,10 @@ def generate(
     ).images
 
 examples = [
+    "portrait photo of a girl, photograph, highly detailed face, depth of field, moody light, golden hour, style by Dan Winters, Russell James, Steve McCurry, centered, extremely detailed, Nikon D850, award winning photography",
+    "Self-portrait oil painting, a beautiful cyborg with golden hair, 8k",
     "Astronaut in a jungle, cold color palette, muted colors, detailed, 8k",
-    "An astronaut riding a green horse",
+    "A photo of beautiful mountain with realistic sunset, highly detailed, masterpiece",
 ]
 
 with gr.Blocks(css="style.css") as demo:
@@ -152,15 +154,15 @@ with gr.Blocks(css="style.css") as demo:
         with gr.Row():
             guidance_scale = gr.Slider(
                 label="Guidance scale for base",
-                minimum=1,
-                maximum=20,
+                minimum=2,
+                maximum=14,
                 step=0.1,
                 value=8.0,
             )
             num_inference_steps = gr.Slider(
                 label="Number of inference steps for base",
                 minimum=1,
-                maximum=5,
+                maximum=8,
                 step=1,
                 value=4,
             )
