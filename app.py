@@ -21,7 +21,7 @@ from tqdm import tqdm
 from safetensors.torch import load_file
 from huggingface_hub import hf_hub_download
 
-DESCRIPTION = "# Latent Consistency"
+DESCRIPTION = "# Latent Consistency Model"
 if not torch.cuda.is_available():
     DESCRIPTION += "\n<p>Running on CPU 🥶 This demo does not work on CPU.</p>"
 
