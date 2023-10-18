@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import random
+import time
 
 import gradio as gr
 import numpy as np
@@ -91,8 +92,8 @@ def generate(
 
     # if width > 512 or height > 512:
     #     num_images = 2
-
-    return pipe(
+    start_time = time.time()
+    result = pipe(
         prompt=prompt,
         width=width,
         height=height,
@@ -102,6 +103,8 @@ def generate(
         lcm_origin_steps=50,
         output_type="pil",
     ).images
+    print(time.time() - start_time)
+    return result
 
 examples = [
     "portrait photo of a girl, photograph, highly detailed face, depth of field, moody light, golden hour, style by Dan Winters, Russell James, Steve McCurry, centered, extremely detailed, Nikon D850, award winning photography",
