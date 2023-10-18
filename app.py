@@ -89,8 +89,8 @@ def generate(
 ) -> PIL.Image.Image:
     torch.manual_seed(seed)
 
-    if width > 512 or height > 512:
-        num_images = 2
+    # if width > 512 or height > 512:
+    #     num_images = 2
 
     return pipe(
         prompt=prompt,
